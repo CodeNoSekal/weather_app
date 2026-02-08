@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.polyhub.weather"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.polyhub.weather"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
