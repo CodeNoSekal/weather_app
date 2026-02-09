@@ -62,12 +62,12 @@ fun Screen() {
         modifier = Modifier
             .fillMaxSize()
     ){
-//        Image(
-//            painter = painterResource(R.drawable.background),
-//            contentDescription = "Background",
-//            modifier = Modifier.fillMaxSize(),
-//            contentScale = ContentScale.Crop
-//        )
+        Image(
+            painter = painterResource(R.drawable.background),
+            contentDescription = "Background",
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.Crop
+        )
 
         Scaffold(
             containerColor = Color.Transparent,
@@ -124,12 +124,6 @@ fun Content(
 ){
     Box(
     ){
-        Image(
-            painter = painterResource(R.drawable.background),
-            contentDescription = "Background",
-            modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Crop
-        )
         Column(modifier = modifier) {
             MainContent()
         }

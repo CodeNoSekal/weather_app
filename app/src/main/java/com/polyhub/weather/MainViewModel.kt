@@ -16,10 +16,30 @@ class MainViewModel : ViewModel() {
     val state: StateFlow<MainViewState> = _state
 
     init {
-        loadWeatherData()
+        refresh()
     }
 
-    private fun loadWeatherData() {
+
+
+    private fun refresh(){
+        val latitude: String? = null
+        val longitude: String? = null
+        val city: String? = null
+
+        viewModelScope.launch { getLocation() }
+
+    }
+
+    private suspend fun getLocation(){
+
+    }
+
+    private fun loadWeatherData(
+        latitude: String,
+        longitude: String,
+        city: String
+
+    ) {
         viewModelScope.launch {
             try {
                 _state.value = MainViewState.Loading

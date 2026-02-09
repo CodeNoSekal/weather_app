@@ -55,9 +55,10 @@ dependencies {
 
 
     implementation(libs.retrofit)
-    implementation("com.squareup.retrofit2:converter-moshi:3.0.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
-    implementation("com.squareup.moshi:moshi:1.15.2")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
-    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation(libs.converter.moshi)
+    implementation(libs.logging.interceptor)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.compose.material.icons.core)
 }
