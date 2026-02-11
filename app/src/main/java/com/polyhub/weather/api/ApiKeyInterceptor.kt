@@ -1,4 +1,4 @@
-package com.polyhub.weather
+package com.polyhub.weather.api
 
 import okhttp3.Interceptor
 import okhttp3.Response

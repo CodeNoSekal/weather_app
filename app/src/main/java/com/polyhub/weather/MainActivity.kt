@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,15 +24,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.polyhub.weather.api.Weather
+import com.polyhub.weather.api.WeatherType
 import com.polyhub.weather.ui.theme.WeatherTheme
 
 class MainActivity : ComponentActivity() {
@@ -44,7 +45,24 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WeatherTheme {
-                Screen()
+
+                val state by viewModel.state.collectAsState()
+
+                when(state){
+                    is MainViewState.Loading -> {
+                        Text("LOADING...")
+                    }
+                    is MainViewState.Success -> {
+                        val weather = (state as MainViewState.Success).weather
+
+                        Screen(
+                            weather = weather
+                        )
+                    }
+                    is MainViewState.Error -> {
+                        Text("ERROR")
+                    }
+                }
             }
         }
     }
@@ -52,22 +70,16 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Screen() {
-
-
-
-
-
+fun Screen(
+    weather: Weather
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
     ){
-        Image(
-            painter = painterResource(R.drawable.background),
-            contentDescription = "Background",
-            modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.Crop
-        )
+        WeatherBackground(weather)
+
+        WeatherAnimationLayer(weather)
 
         Scaffold(
             containerColor = Color.Transparent,
@@ -75,7 +87,7 @@ fun Screen() {
                 TopAppBar(
                     title = {
                         Text(
-                            text = "Местоположение",
+                            text = weather.locationName,
                             color = MaterialTheme.colorScheme.primary
                         )
 
@@ -111,7 +123,8 @@ fun Screen() {
         ) { innerPadding ->
             Content(
                 modifier = Modifier
-                    .padding(innerPadding)
+                    .padding(innerPadding),
+                weather
             )
         }
     }
@@ -119,19 +132,53 @@ fun Screen() {
 }
 
 @Composable
+fun WeatherBackground(
+    weather: Weather
+) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(
+            when (weather.weatherType) {
+                WeatherType.CLEAR -> Color(0xFF64B5F6)
+                WeatherType.CLOUDS -> Color(0xFF90A4AE)
+                WeatherType.RAIN -> Color(0xFF263238)
+                WeatherType.SNOW -> Color(0xFFB3E5FC)
+                else -> Color.Gray
+            }
+        ))
+}
+
+@Composable
+fun WeatherAnimationLayer(
+    weather: Weather
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        when (weather.weatherType) {
+            WeatherType.SNOW -> SnowAnimation(weather)
+            else -> {}
+        }
+    }
+}
+
+@Composable
 fun Content(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    weather: Weather
 ){
     Box(
     ){
         Column(modifier = modifier) {
-            MainContent()
+            MainContent(weather)
         }
     }
 }
 
 @Composable
 fun MainContent(
+    weather: Weather
 ){
     Column(
         modifier = Modifier
@@ -141,7 +188,7 @@ fun MainContent(
     ) {
         Row() {
             Text(
-                text = "20",
+                text = weather.temperature,
                 fontSize = 72.sp,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -153,16 +200,8 @@ fun MainContent(
         }
 
         Text(
-            text = "Переменная облачность",
+            text = weather.description,
             color = MaterialTheme.colorScheme.primary
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun WeatherPreview() {
-    WeatherTheme {
-        Screen()
     }
 }

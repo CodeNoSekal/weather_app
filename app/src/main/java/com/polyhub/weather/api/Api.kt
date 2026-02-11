@@ -1,4 +1,4 @@
-package com.polyhub.weather
+package com.polyhub.weather.api
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -14,9 +14,9 @@ interface Api{
     @GET("/data/2.5/weather")
     suspend fun getWeather(
         @Query("lat")
-        latitude: Double,
+        latitude: String?,
         @Query("lon")
-        longitude: Double,
+        longitude: String?,
         @Query("units")
         units: String = "metric",
         @Query("lang")
@@ -27,7 +27,7 @@ interface Api{
 
 object RetrofitClient{
     private const val BASE_URL = "https://api.openweathermap.org"
-    const val API_KEY = ""
+    const val API_KEY = "935018b9c136671e3767def8e0082b99"
 
     val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

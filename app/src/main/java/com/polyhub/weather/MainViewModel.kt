@@ -3,9 +3,20 @@ package com.polyhub.weather
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.polyhub.weather.api.Api
+import com.polyhub.weather.api.ApiResponse
+import com.polyhub.weather.api.RetrofitClient
+import com.polyhub.weather.api.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+
+
+
+data class Location(
+    val latitude: String?,
+    val longitude: String?
+)
 
 class MainViewModel : ViewModel() {
 
@@ -16,41 +27,33 @@ class MainViewModel : ViewModel() {
     val state: StateFlow<MainViewState> = _state
 
     init {
-        refresh()
-    }
-
-
-
-    private fun refresh(){
-        val latitude: String? = null
-        val longitude: String? = null
-        val city: String? = null
-
-        viewModelScope.launch { getLocation() }
-
-    }
-
-    private suspend fun getLocation(){
-
+        loadWeatherData()
     }
 
     private fun loadWeatherData(
-        latitude: String,
-        longitude: String,
-        city: String
 
     ) {
         viewModelScope.launch {
             try {
                 _state.value = MainViewState.Loading
 
-                val apiResponse: ApiResponse = api.getWeather()
+                val location: Location = getLocation()
 
-                _state.value = MainViewState.Success(apiResponse)
+                if (location != null) {
+                    val apiResponse: ApiResponse =
+                        api.getWeather(location.latitude, location.longitude)
+                    _state.value = MainViewState.Success(apiResponse.toUiModel())
+                } else{
+                    _state.value = MainViewState.Error("Не удалось определить местоположение")
+                }
             } catch (e: Exception){
                 Log.e("MainViewModel", "Error loading weather data", e)
                 _state.value = MainViewState.Error(e.message ?: "Unknown error")
             }
         }
+    }
+
+    private suspend fun getLocation() : Location{
+        return Location("55.624856", "37.306683")
     }
 }
