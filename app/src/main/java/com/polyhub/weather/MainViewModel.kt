@@ -1,6 +1,9 @@
 package com.polyhub.weather
 
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polyhub.weather.api.Api
@@ -18,7 +21,9 @@ data class Location(
     val longitude: String?
 )
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val dataStore: DataStore<Preferences>
+) : ViewModel() {
 
     private val api: Api = RetrofitClient.api
 
@@ -27,12 +32,30 @@ class MainViewModel : ViewModel() {
     val state: StateFlow<MainViewState> = _state
 
     init {
-        loadWeatherData()
+        loadWeather()
     }
 
-    private fun loadWeatherData(
+    fun saveRequestedPermission(requested: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { settings ->
+                settings[PreferencesKeys.HES_REQUESTETED_LOCATION_PERMISSION] = requested
+            }
+        }
+    }
 
-    ) {
+    fun onLocationPermissionGranted(){
+        loadWeather()
+    }
+
+    fun onPermissionDenied(){
+        loadWeather()
+    }
+
+    fun refreshWeather() {
+        loadWeather()
+    }
+
+    private fun loadWeather() {
         viewModelScope.launch {
             try {
                 _state.value = MainViewState.Loading
@@ -56,4 +79,5 @@ class MainViewModel : ViewModel() {
     private suspend fun getLocation() : Location{
         return Location("55.624856", "37.306683")
     }
+
 }

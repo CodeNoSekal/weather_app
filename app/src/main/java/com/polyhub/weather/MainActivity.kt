@@ -1,9 +1,13 @@
 package com.polyhub.weather
 
+import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,27 +28,37 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.preferencesDataStore
 import com.polyhub.weather.api.Weather
 import com.polyhub.weather.api.WeatherType
 import com.polyhub.weather.ui.theme.WeatherTheme
+import kotlinx.coroutines.flow.map
+
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainViewModel by viewModels()
+    val viewModel: MainViewModel by viewModels {
+        MainViewModelFactory(applicationContext.dataStore)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
             WeatherTheme {
+
+                LocationPermission(viewModel)
 
                 val state by viewModel.state.collectAsState()
 
@@ -56,7 +70,8 @@ class MainActivity : ComponentActivity() {
                         val weather = (state as MainViewState.Success).weather
 
                         Screen(
-                            weather = weather
+                            weather,
+                            viewModel
                         )
                     }
                     is MainViewState.Error -> {
@@ -68,10 +83,47 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable
+fun LocationPermission(
+    viewModel: MainViewModel
+){
+    val context = LocalContext.current
+    val dataStore = context.dataStore
+    val hasRequestedPermission by dataStore.data
+        .map {it[PreferencesKeys.HES_REQUESTETED_LOCATION_PERMISSION] ?: false}
+        .collectAsState(initial = false)
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions.values.any { it }
+
+        viewModel.saveRequestedPermission(true)
+
+        if (granted){
+            viewModel.onLocationPermissionGranted()
+        } else{
+            viewModel.onPermissionDenied()
+        }
+    }
+
+    LaunchedEffect(hasRequestedPermission) {
+        if(!hasRequestedPermission) {
+            launcher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Screen(
-    weather: Weather
+    weather: Weather,
+    viewModel: MainViewModel
 ) {
     Box(
         modifier = Modifier
@@ -103,7 +155,7 @@ fun Screen(
                     },
                     actions = {
                         IconButton( onClick = {
-
+                            viewModel.refreshWeather()
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Refresh,
@@ -142,7 +194,7 @@ fun WeatherBackground(
                 WeatherType.CLEAR -> Color(0xFF64B5F6)
                 WeatherType.CLOUDS -> Color(0xFF90A4AE)
                 WeatherType.RAIN -> Color(0xFF263238)
-                WeatherType.SNOW -> Color(0xFFB3E5FC)
+                WeatherType.SNOW -> Color(0xFF0D47A1)
                 else -> Color.Gray
             }
         ))

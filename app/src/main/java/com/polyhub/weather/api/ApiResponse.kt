@@ -3,6 +3,7 @@ package com.polyhub.weather.api
 import com.squareup.moshi.Json
 
 data class ApiResponse(
+    @param:Json(name = "weather")
     val weatherState: List<WeatherData>,
     val main: MainData,
     val clouds: CloudsData,

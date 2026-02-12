@@ -62,4 +62,6 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.coil.compose)
     implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.play.services.location)
+    implementation(libs.androidx.datastore.preferences)
 }
