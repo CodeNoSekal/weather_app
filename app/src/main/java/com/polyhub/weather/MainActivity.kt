@@ -1,7 +1,6 @@
 package com.polyhub.weather
 
 import android.Manifest
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -34,19 +33,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.polyhub.weather.api.LocationProvider
 import com.polyhub.weather.api.Weather
 import com.polyhub.weather.api.WeatherType
 import com.polyhub.weather.ui.theme.WeatherTheme
-import kotlinx.coroutines.flow.map
 
 class MainActivity : ComponentActivity() {
 
     val viewModel: MainViewModel by viewModels {
-        MainViewModelFactory(applicationContext.dataStore)
+        MainViewModelFactory(applicationContext.dataStore, LocationProvider(context = applicationContext))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

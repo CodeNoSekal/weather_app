@@ -64,4 +64,9 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.play.services.location)
     implementation(libs.androidx.datastore.preferences)
+
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    implementation(libs.androidx.compose.material3)
+
 }
