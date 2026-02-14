@@ -38,12 +38,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.preferencesDataStore
 import com.polyhub.weather.api.Weather
 import com.polyhub.weather.api.WeatherType
 import com.polyhub.weather.ui.theme.WeatherTheme
 import kotlinx.coroutines.flow.map
-
 
 class MainActivity : ComponentActivity() {
 
@@ -87,11 +85,9 @@ class MainActivity : ComponentActivity() {
 fun LocationPermission(
     viewModel: MainViewModel
 ){
-    val context = LocalContext.current
-    val dataStore = context.dataStore
-    val hasRequestedPermission by dataStore.data
-        .map {it[PreferencesKeys.HES_REQUESTETED_LOCATION_PERMISSION] ?: false}
-        .collectAsState(initial = false)
+    val hasRequestedPermission by viewModel
+        .hasRequestedPermission
+        .collectAsState()
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
