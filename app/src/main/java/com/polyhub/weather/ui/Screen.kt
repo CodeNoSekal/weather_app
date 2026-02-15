@@ -23,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.polyhub.weather.MainViewModel
-import com.polyhub.weather.SnowAnimation
 import com.polyhub.weather.api.Weather
 import com.polyhub.weather.api.WeatherType
 
@@ -68,17 +67,6 @@ fun Screen(
                                 Icon(
                                     imageVector = Icons.Filled.Menu,
                                     contentDescription = "Menu",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        },
-                        actions = {
-                            IconButton(onClick = {
-                                viewModel.refreshWeather()
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Refresh,
-                                    contentDescription = "Refresh",
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }

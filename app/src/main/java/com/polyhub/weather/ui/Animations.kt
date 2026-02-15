@@ -1,4 +1,4 @@
-package com.polyhub.weather
+package com.polyhub.weather.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,12 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.polyhub.weather.api.Weather
+import kotlin.math.sin
 import kotlin.random.Random
 
-data class RainDrop(
+data class SnowFlake(
     var x: Float,
     var y: Float,
-    val speed: Float
+    val speedX: Float,
+    val speedY: Float,
+    var alpha: Float,
+    var radius: Float
 )
 
 @Composable
@@ -24,13 +28,16 @@ fun SnowAnimation(
     weather: Weather
 ) {
     val flakes = remember {
-        SnapshotStateList<RainDrop>().apply {
+        SnapshotStateList<SnowFlake>().apply {
             addAll(
                 List(50) {
-                    RainDrop(
+                    SnowFlake(
                         x = Random.nextFloat(),
                         y = Random.nextFloat(),
-                        speed = Random.nextFloat() * 0.0005f + 0.001f
+                        speedX = Random.nextFloat() * 0.0001f - 0.00005f,
+                        speedY = Random.nextFloat() * 0.00015f + 0.0004f,
+                        alpha = Random.nextFloat() * 0.5f + 0.5f,
+                        radius = Random.nextFloat() * 4f + 3f
                     )
                 }
             )
@@ -42,9 +49,11 @@ fun SnowAnimation(
             val frameTime = withFrameNanos { }
 
             flakes.forEachIndexed { index, flake ->
-                val newY = flake.y + flake.speed
+                val newX = flake.x + flake.speedX
+                val newY = flake.y + flake.speedY
                 flakes[index] = flake.copy(
-                    y = if (newY > 1f) 0f else newY
+                    x = if (newX > 1.01f) -0.01f else if (newX < -0.01f) 1.01f else newX,
+                    y = if (newY > 1.01f) -0.01f else newY,
                 )
             }
         }
@@ -55,12 +64,9 @@ fun SnowAnimation(
     ) {
         flakes.forEach { flake ->
             drawCircle(
-                color = Color.White,
-                radius = 4f,
-                center = Offset(
-                    flake.x * size.width,
-                    flake.y * size.height
-                )
+                color = Color.White.copy(alpha = flake.alpha),
+                radius = flake.radius,
+                center = Offset(flake.x * size.width, flake.y * size.height)
             )
         }
     }
