@@ -66,12 +66,14 @@ class MainViewModel(
     }
 
     fun refreshWeather() {
+
+        if(_isRefreshing.value) return
+
         viewModelScope.launch {
             _isRefreshing.value = true
             loadWeather(true)
             _isRefreshing.value = false
         }
-
     }
 
     private fun loadWeather() {

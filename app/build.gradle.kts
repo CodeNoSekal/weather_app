@@ -60,13 +60,16 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
+
     implementation(libs.coil.compose)
     implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.play.services.location)
+    implementation(libs.androidx.compose.material3)
+
     implementation(libs.androidx.datastore.preferences)
 
+    implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
 
-    implementation(libs.androidx.compose.material3)
+
 
 }
