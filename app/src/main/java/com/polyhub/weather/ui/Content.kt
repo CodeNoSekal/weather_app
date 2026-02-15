@@ -24,8 +24,7 @@ fun Content(
     modifier: Modifier = Modifier,
     weather: Weather
 ){
-    Box(
-    ){
+    Box{
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -46,7 +45,7 @@ fun MainContent(
             .padding(vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row() {
+        Row{
             Text(
                 text = weather.temperature,
                 fontSize = 72.sp,
