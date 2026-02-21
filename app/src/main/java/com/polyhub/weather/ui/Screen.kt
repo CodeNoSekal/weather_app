@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.polyhub.weather.MainViewModel
-import com.polyhub.weather.MainViewState
 import com.polyhub.weather.api.Weather
 import com.polyhub.weather.api.WeatherType
 
@@ -89,24 +87,6 @@ fun Screen(
         }
     }
 
-}
-
-
-@Composable
-fun WeatherBackground(
-    weather: Weather
-) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(
-            when (weather.weatherType) {
-                WeatherType.CLEAR -> Color(0xFF64B5F6)
-                WeatherType.CLOUDS -> Color(0xFF90A4AE)
-                WeatherType.RAIN -> Color(0xFF263238)
-                WeatherType.SNOW -> Color(0xFF0D47A1)
-                else -> Color.Gray
-            }
-        ))
 }
 
 @Composable
