@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.polyhub.weather.MainViewModel
+import com.polyhub.weather.MainViewState
 import com.polyhub.weather.api.Weather
 import com.polyhub.weather.api.WeatherType
 
@@ -32,7 +33,6 @@ fun Screen(
     weather: Weather,
     viewModel: MainViewModel
 ) {
-
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val pullRefreshState = rememberPullToRefreshState()
     val onRefresh = { viewModel.refreshWeather() }

@@ -8,12 +8,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.polyhub.weather.api.LocationProvider
+import com.polyhub.weather.ui.LoadingScreen
 import com.polyhub.weather.ui.Screen
 import com.polyhub.weather.ui.theme.WeatherTheme
 
@@ -34,9 +36,13 @@ class MainActivity : ComponentActivity() {
 
                 val state by viewModel.state.collectAsState()
 
+                Box{
+
+                }
+
                 when(state){
                     is MainViewState.Loading -> {
-                        Text("LOADING...")
+                        LoadingScreen()
                     }
                     is MainViewState.Success -> {
                         val weather = (state as MainViewState.Success).weather
