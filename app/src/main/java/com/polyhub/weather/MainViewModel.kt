@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polyhub.weather.api.Api
+import com.polyhub.weather.api.ApiForecastResponse
 import com.polyhub.weather.api.ApiResponse
 import com.polyhub.weather.api.Location
 import com.polyhub.weather.api.LocationProvider
@@ -90,8 +91,13 @@ class MainViewModel(
             if (location != null) {
                 val apiResponse: ApiResponse =
                     api.getWeather(location.latitude, location.longitude)
+
+                val apiForecastResponse: ApiForecastResponse =
+                    api.getForecast(location.latitude, location.longitude)
+
                 _state.value =
-                    MainViewState.Success(apiResponse.toUiModel())
+                    MainViewState.Success(apiResponse.toUiModel(), apiForecastResponse.toUiModel())
+
             } else{
                 _state.value =
                     MainViewState.Error("Не удалось определить местоположение")

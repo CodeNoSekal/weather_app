@@ -36,3 +36,20 @@ data class Sys(
     val sunrise: Long,
     val sunset: Long
 )
+
+data class ApiForecastResponse(
+    val list: List<ApiForecastItem>,
+    val city: LocationData
+)
+
+data class ApiForecastItem(
+    @param:Json(name = "dt")
+    val dateTime: Long,
+    val main: MainData
+)
+
+data class LocationData(
+    val timezone: Int,
+    val sunrise: Long,
+    val sunset: Long
+)

@@ -23,6 +23,18 @@ interface Api{
         lang: String = "ru"
     ): ApiResponse
 
+    @GET("/data/2.5/forecast")
+    suspend fun getForecast(
+        @Query("lat")
+        latitude: String?,
+        @Query("lon")
+        longitude: String?,
+        @Query("units")
+        units: String = "metric",
+        @Query("lang")
+        lang: String = "ru"
+    ): ApiForecastResponse
+
 }
 
 object RetrofitClient{

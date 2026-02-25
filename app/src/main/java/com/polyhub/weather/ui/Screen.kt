@@ -23,13 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.polyhub.weather.MainViewModel
 import com.polyhub.weather.api.Weather
+import com.polyhub.weather.api.WeatherForecast
 import com.polyhub.weather.api.WeatherType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Screen(
     weather: Weather,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    forecast: WeatherForecast
 ) {
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val pullRefreshState = rememberPullToRefreshState()
@@ -81,7 +83,8 @@ fun Screen(
                 Content(
                     modifier = Modifier
                         .padding(innerPadding),
-                    weather = weather
+                    weather = weather,
+                    forecast = forecast
                 )
             }
         }

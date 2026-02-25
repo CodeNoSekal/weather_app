@@ -6,6 +6,14 @@ import java.time.ZoneOffset
 import java.time.Duration
 import kotlin.time.Instant
 
+
+enum class WeatherType {
+    CLEAR, CLOUDS, RAIN, SNOW, OTHER
+}
+
+enum class TimeOfDay {
+    DAY, NIGHT
+}
 data class Weather(
     val id: Int,
     val locationName: String,
@@ -19,14 +27,6 @@ data class Weather(
     val sunset: LocalTime,
     val timeOfDay: TimeOfDay
 )
-
-enum class WeatherType {
-    CLEAR, CLOUDS, RAIN, SNOW, OTHER
-}
-
-enum class TimeOfDay {
-    DAY, NIGHT, SUNRISE, SUNSET
-}
 
 fun ApiResponse.toUiModel(): Weather {
     val weather = this.weatherState.first()
@@ -79,21 +79,9 @@ fun ApiResponse.toUiModel(): Weather {
 }
 
 fun getTimeOfDay(time: LocalTime, sunrise: LocalTime, sunset: LocalTime): TimeOfDay {
-    // Проверяем рассвет
-    if (Duration.between(sunrise, time).abs().toHours() <= 1) {
-        return TimeOfDay.SUNRISE
-    }
-
-    // Проверяем закат
-    if (Duration.between(sunset, time).abs().toHours() <= 1) {
-        return TimeOfDay.SUNSET
-    }
-
-    // День: после рассвета +1 час и до заката -1 час
-    if (time.isAfter(sunrise.plusHours(1)) && time.isBefore(sunset.minusHours(1))) {
+    if (time.isAfter(sunrise.minusHours(1)) && time.isBefore(sunset.plusHours(1))) {
         return TimeOfDay.DAY
     }
 
-    // Всё остальное — ночь
     return TimeOfDay.NIGHT
 }

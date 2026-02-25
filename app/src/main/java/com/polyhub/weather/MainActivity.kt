@@ -46,10 +46,12 @@ class MainActivity : ComponentActivity() {
                     }
                     is MainViewState.Success -> {
                         val weather = (state as MainViewState.Success).weather
+                        val forecast = (state as MainViewState.Success).weatherForecast
 
                         Screen(
                             weather,
-                            viewModel
+                            viewModel,
+                            forecast
                         )
                     }
                     is MainViewState.Error -> {
