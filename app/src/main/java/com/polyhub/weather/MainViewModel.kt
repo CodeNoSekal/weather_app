@@ -1,9 +1,7 @@
 package com.polyhub.weather
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.annotation.RequiresPermission
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit

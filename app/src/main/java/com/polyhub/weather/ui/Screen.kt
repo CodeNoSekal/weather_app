@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavController
 import com.polyhub.weather.MainViewModel
 import com.polyhub.weather.api.Weather
 import com.polyhub.weather.api.WeatherForecast
@@ -31,7 +32,8 @@ import com.polyhub.weather.api.WeatherType
 fun Screen(
     weather: Weather,
     viewModel: MainViewModel,
-    forecast: WeatherForecast
+    forecast: WeatherForecast,
+    navController: NavController
 ) {
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val pullRefreshState = rememberPullToRefreshState()
@@ -63,7 +65,9 @@ fun Screen(
 
                         },
                         navigationIcon = {
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = {
+                                navController.navigate("locations_screen")
+                            }) {
                                 Icon(
                                     imageVector = Icons.Filled.Menu,
                                     contentDescription = "Menu",

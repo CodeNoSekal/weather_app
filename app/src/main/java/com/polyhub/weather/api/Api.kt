@@ -23,7 +23,7 @@ interface Api{
         lang: String = "ru"
     ): ApiResponse
 
-    @GET("/data/2.5/forecast")
+    @GET("/data/2.5/forecast/hourly")
     suspend fun getForecast(
         @Query("lat")
         latitude: String?,

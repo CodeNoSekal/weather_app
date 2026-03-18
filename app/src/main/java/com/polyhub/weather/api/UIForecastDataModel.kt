@@ -30,9 +30,20 @@ fun ApiForecastResponse.toUiModel(): WeatherForecast {
         weatherItems.add(ForecastItem(time, temp))
     }
 
+    val first = weatherItems.first()
+
+    var target = 0
+
+    for (i in 1..<weatherItems.size){
+        if (weatherItems[i].time == first.time){
+            target = i
+            break
+        }
+    }
+
 
     return WeatherForecast(
-        forecast = weatherItems.toList()
+        forecast = weatherItems.toList().take(target)
     )
 
 }
