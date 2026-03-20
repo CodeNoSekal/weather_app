@@ -53,10 +53,10 @@ data class LocationData(
 )
 
 data class LocationResponse(
-    val results: List<Location>
+    val results: List<CityData>
 )
 
-data class Location(
+data class CityData(
     val name: String,
     @param:Json(name = "local_names")
     val localNames: LocalNames?,
