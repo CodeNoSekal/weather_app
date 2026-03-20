@@ -7,13 +7,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.Room
 import com.polyhub.weather.api.Api
-import com.polyhub.weather.api.ForecastUI
 import com.polyhub.weather.api.Location
 import com.polyhub.weather.api.LocationProvider
 import com.polyhub.weather.api.RetrofitClient
-import com.polyhub.weather.api.WeatherUI
+import com.polyhub.weather.api.UIData
 import com.polyhub.weather.api.toUiModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -98,10 +96,10 @@ class MainViewModel(
                 return
             }
 
-            val (weather, forecast) = loadWeatherData(location)
+            val uiData = loadWeatherData(location)
 
             _state.value =
-                MainViewState.Success(weather, forecast)
+                MainViewState.Success(uiData)
 
         } catch (e: Exception){
             Log.e("MainViewModel", "Error loading weather data", e)
@@ -116,7 +114,7 @@ class MainViewModel(
     }
 
     private suspend fun loadWeatherData(location: Location)
-    : Pair<WeatherUI, ForecastUI> = kotlinx.coroutines.coroutineScope {
+    : UIData = kotlinx.coroutines.coroutineScope {
 
         val weatherDeferred = async {
             api.getWeather(location.latitude, location.longitude)
@@ -126,10 +124,15 @@ class MainViewModel(
             api.getForecast(location.latitude, location.longitude)
         }
 
+        val locationNameDeferred = async {
+            api.getLocationName(location.latitude, location.longitude)
+        }
+
         val weather = weatherDeferred.await().toUiModel()
         val forecast = forecastDeferred.await().toUiModel()
+        val location = locationNameDeferred.await().toUiModel()
 
-        weather to forecast
+        UIData(weather, forecast, location)
     }
 
 }

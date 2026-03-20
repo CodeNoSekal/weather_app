@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.polyhub.weather.api.ForecastUI
+import com.polyhub.weather.api.LocationUI
 import com.polyhub.weather.api.WeatherUI
 import com.polyhub.weather.api.WeatherType
 
@@ -26,6 +27,7 @@ import com.polyhub.weather.api.WeatherType
 fun Screen(
     weather: WeatherUI,
     forecast: ForecastUI,
+    location: LocationUI,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     onMenuClick: () -> Unit
@@ -49,7 +51,7 @@ fun Screen(
                 containerColor = Color.Transparent,
                 topBar = {
                     WeatherTopBar(
-                        locationName = weather.locationName,
+                        locationName = location.name,
                         onMenuClick = onMenuClick
                     )
                 },

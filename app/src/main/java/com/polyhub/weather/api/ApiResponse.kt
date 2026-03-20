@@ -1,67 +1,71 @@
 package com.polyhub.weather.api
 
-import com.polyhub.weather.City
 import com.squareup.moshi.Json
 
-data class WeatherResponse(
+data class CurrentWeatherResponse(
     @param:Json(name = "weather")
-    val weatherState: List<WeatherData>,
-    val main: MainData,
+    val weatherStates: List<WeatherState>,
+    @param:Json(name = "main")
+    val weatherData: MainWeatherData,
     val clouds: CloudsData,
-    val dt: Long,
+    @param:Json(name = "dt")
+    val rowDateTime: Long,
     @param:Json(name = "name")
-    val city: String,
-    val sys: Sys,
+    val locationName: String,
+    @param:Json(name = "sys")
+    val sunData: SunData,
     val timezone: Int
 )
 
-data class WeatherData(
+data class WeatherState(
     val id: Int,
     val main: String,
     @param:Json(name = "description")
-    val desc: String
+    val rowDescription: String
+)
+
+data class MainWeatherData(
+    val temp: Double
 )
 
 data class CloudsData(
     val all: String
 )
 
-data class MainData(
-    val temp: Double
-)
-
-data class Sys(
+data class SunData(
     val sunrise: Long,
     val sunset: Long
 )
 
-data class ForecastResponse(
-    val list: List<ForecastItem>,
-    val city: LocationData
+data class HourlyForecastResponse(
+    @param:Json(name = "list")
+    val forecastList: List<ForecastItem>,
+    @param:Json(name = "city")
+    val timeData: TimeData
 )
 
 data class ForecastItem(
     @param:Json(name = "dt")
     val dateTime: Long,
-    val main: MainData
+    @param:Json(name = "main")
+    val weatherData: MainWeatherData
 )
 
-data class LocationData(
+data class TimeData(
     val timezone: Int,
     val sunrise: Long,
     val sunset: Long
 )
 
-data class LocationResponse(
-    val results: List<CityData>
-)
 
-data class CityData(
+data class LocationResponse(
     val name: String,
     @param:Json(name = "local_names")
     val localNames: LocalNames?,
-    val lat: String,
-    val lon: String
+    @param:Json(name = "lat")
+    val latitude: Double,
+    @param:Json(name = "lon")
+    val longitude: Double
 )
 
 data class LocalNames(

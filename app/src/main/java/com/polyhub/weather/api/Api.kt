@@ -21,7 +21,7 @@ interface Api{
         units: String = "metric",
         @Query("lang")
         lang: String = "ru"
-    ): WeatherResponse
+    ): CurrentWeatherResponse
 
     @GET("/data/2.5/forecast/hourly")
     suspend fun getForecast(
@@ -33,7 +33,7 @@ interface Api{
         units: String = "metric",
         @Query("lang")
         lang: String = "ru"
-    ): ForecastResponse
+    ): HourlyForecastResponse
 
     @GET("/geo/1.0/direct")
     suspend fun findCity(
@@ -41,7 +41,7 @@ interface Api{
         request: String?,
         @Query("lang")
         lang: String = "ru"
-    ): LocationResponse
+    ): List<LocationResponse>
 
     @GET("/geo/1.0/reverse")
     suspend fun getLocationName(
@@ -51,7 +51,7 @@ interface Api{
         longitude: String?,
         @Query("lang")
         lang: String = "ru"
-    ): LocationResponse
+    ): List<LocationResponse>
 
 }
 

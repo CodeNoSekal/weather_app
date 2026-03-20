@@ -38,17 +38,17 @@ fun WeatherBackground(
 
 fun clearGradient(timeOfDay: TimeOfDay): List<Color> = when(timeOfDay){
     TimeOfDay.DAY -> listOf(Color(0xFF47B8FF), Color(0xFF315F8A))
-    TimeOfDay.NIGHT -> listOf(Color(0xFF191E3A), Color(0xFF0B0E1F))
+    TimeOfDay.NIGHT -> listOf(Color(0xFF384B60), Color(0xFF1C2A3A))
 }
 
 fun cloudyGradient(timeOfDay: TimeOfDay): List<Color> = when (timeOfDay) {
     TimeOfDay.DAY -> listOf(Color(0xFFB0BEC5), Color(0xFF607D8B))      // светло-серый → серо-голубой
-    TimeOfDay.NIGHT -> listOf(Color(0xFF37474F), Color(0xFF263238))     // тёмно-серый → почти чёрный
+    TimeOfDay.NIGHT -> listOf(Color(0xFF384B60), Color(0xFF1C2A3A))     // тёмно-серый → почти чёрный
 }
 
 fun rainyGradient(timeOfDay: TimeOfDay): List<Color> = when (timeOfDay) {
     TimeOfDay.DAY -> listOf(Color(0xFF4B6584), Color(0xFF2C3A47))       // сине-серый → тёмный сланец
-    TimeOfDay.NIGHT -> listOf(Color(0xFF1E2A3A), Color(0xFF0F1A24))     // очень тёмный синий → чёрный
+    TimeOfDay.NIGHT -> listOf(Color(0xFF384B60), Color(0xFF1C2A3A))     // очень тёмный синий → чёрный
 }
 
 fun snowyGradient(timeOfDay: TimeOfDay): List<Color> = when (timeOfDay) {

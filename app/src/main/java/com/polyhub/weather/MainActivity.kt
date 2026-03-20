@@ -80,11 +80,12 @@ fun WeatherRoute(
 ){
     MainStateHandler(state) {success ->
         Screen(
-            weather = success.weatherUI,
-            forecast = success.weatherForecast,
+            weather = success.uiData.weatherUI,
+            forecast = success.uiData.forecastUI,
+            location = success.uiData.locationUI,
             isRefreshing = viewModel.isRefreshing.collectAsState().value,
             onRefresh = { viewModel.refreshWeather() },
-            onMenuClick = { navController.navigate("location_screen") }
+            onMenuClick = { navController.navigate("locations_screen") }
         )
     }
 }
@@ -97,7 +98,7 @@ fun LocationsRoute(
 ) {
     MainStateHandler(state) { success ->
         LocationsScreen(
-            success.weatherUI,
+            success.uiData.weatherUI,
             viewModel,
             navController
         )

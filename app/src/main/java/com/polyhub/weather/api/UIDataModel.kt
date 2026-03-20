@@ -26,21 +26,21 @@ data class WeatherUI(
     val timeOfDay: TimeOfDay
 )
 
-fun ApiResponse.toUiModel(): WeatherUI {
-    val weather = weatherState.first()
+fun CurrentWeatherResponse.toUiModel(): WeatherUI {
+    val weather = weatherStates.first()
 
     val zoneOffset = ZoneOffset.ofTotalSeconds(timezone)
 
-    val dateTime = dt.toLocalDateTime(zoneOffset)
+    val dateTime = rowDateTime.toLocalDateTime(zoneOffset)
     val currentTime = dateTime.toLocalTime()
-    val sunrise = sys.sunrise.toLocalDateTime(zoneOffset).toLocalTime()
-    val sunset = sys.sunset.toLocalDateTime(zoneOffset).toLocalTime()
+    val sunrise = sunData.sunrise.toLocalDateTime(zoneOffset).toLocalTime()
+    val sunset = sunData.sunset.toLocalDateTime(zoneOffset).toLocalTime()
 
     return WeatherUI(
         id = weather.id,
-        locationName = city,
-        temperature = main.temp.toInt().toString(),
-        description = weather.desc.replaceFirstChar { it.uppercase() },
+        locationName = locationName,
+        temperature = weatherData.temp.toInt().toString(),
+        description = weather.rowDescription.replaceFirstChar { it.uppercase() },
         weatherType = weather.main.toWeatherType(),
         date =  dateTime.toLocalDate(),
         time = dateTime.toLocalTime(),

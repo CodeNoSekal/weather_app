@@ -4,23 +4,23 @@ import java.time.LocalTime
 import java.time.ZoneOffset
 
 data class ForecastUI(
-    val forecast: List<ForecastItem>
+    val forecast: List<ForecastUIItem>
 )
 
-data class ForecastItem(
+data class ForecastUIItem(
     val time: LocalTime,
     val temperature: String
 )
 
-fun ApiForecastResponse.toUiModel(): ForecastUI {
-    val zoneOffset = ZoneOffset.ofTotalSeconds(city.timezone)
+fun HourlyForecastResponse.toUiModel(): ForecastUI {
+    val zoneOffset = ZoneOffset.ofTotalSeconds(timeData.timezone)
 
-    val weatherItems = list.map { item ->
+    val weatherItems = forecastList.map { item ->
         val dateTime = item.dateTime.toLocalDateTime(zoneOffset)
 
-        ForecastItem(
+        ForecastUIItem(
             time = dateTime.toLocalTime(),
-            temperature = item.main.temp.toInt().toString()
+            temperature = item.weatherData.temp.toInt().toString()
         )
     }
 

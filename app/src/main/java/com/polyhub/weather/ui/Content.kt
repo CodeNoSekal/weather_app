@@ -28,8 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.polyhub.weather.R
-import com.polyhub.weather.api.ForecastItem
 import com.polyhub.weather.api.ForecastUI
+import com.polyhub.weather.api.ForecastUIItem
 import com.polyhub.weather.api.WeatherUI
 
 @Composable
@@ -87,7 +87,7 @@ fun MainContent(
 
 @Composable
 fun Forecast(
-    forecast: WeatherForecast
+    forecast: ForecastUI
 ){
     Box(
         modifier = Modifier
@@ -113,7 +113,7 @@ fun Forecast(
 
 @Composable
 fun ForecastItem(
-    item: ForecastItem
+    item: ForecastUIItem
 ){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
