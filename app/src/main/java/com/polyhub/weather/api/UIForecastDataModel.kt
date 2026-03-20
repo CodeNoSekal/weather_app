@@ -3,7 +3,7 @@ package com.polyhub.weather.api
 import java.time.LocalTime
 import java.time.ZoneOffset
 
-data class WeatherForecast(
+data class ForecastUI(
     val forecast: List<ForecastItem>
 )
 
@@ -12,38 +12,28 @@ data class ForecastItem(
     val temperature: String
 )
 
-fun ApiForecastResponse.toUiModel(): WeatherForecast {
+fun ApiForecastResponse.toUiModel(): ForecastUI {
+    val zoneOffset = ZoneOffset.ofTotalSeconds(city.timezone)
 
-    val weatherItems: MutableList<ForecastItem> = mutableListOf()
+    val weatherItems = list.map { item ->
+        val dateTime = item.dateTime.toLocalDateTime(zoneOffset)
 
-    val zoneOffset = ZoneOffset.ofTotalSeconds(this.city.timezone)
-
-    for (item in this.list){
-
-        val instant = java.time.Instant.ofEpochSecond(item.dateTime)
-        val dateTime = instant.atOffset(zoneOffset)
-
-        val time = dateTime.toLocalTime()
-
-        val temp = item.main.temp.toInt().toString()
-
-        weatherItems.add(ForecastItem(time, temp))
+        ForecastItem(
+            time = dateTime.toLocalTime(),
+            temperature = item.main.temp.toInt().toString()
+        )
     }
 
-    val first = weatherItems.first()
+    val firstTime = weatherItems.firstOrNull()?.time
 
-    var target = 0
-
-    for (i in 1..<weatherItems.size){
-        if (weatherItems[i].time == first.time){
-            target = i
-            break
-        }
-    }
+    val targetIndex = weatherItems
+        .drop(1)
+        .indexOfFirst { it.time == firstTime }
+        .let { if (it == -1) weatherItems.size else it + 1 }
 
 
-    return WeatherForecast(
-        forecast = weatherItems.toList().take(target)
+    return ForecastUI(
+        forecast = weatherItems.toList().take(targetIndex)
     )
 
 }

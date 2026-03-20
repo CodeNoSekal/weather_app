@@ -7,13 +7,15 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Room
 import com.polyhub.weather.api.Api
-import com.polyhub.weather.api.ApiForecastResponse
-import com.polyhub.weather.api.ApiResponse
+import com.polyhub.weather.api.ForecastUI
 import com.polyhub.weather.api.Location
 import com.polyhub.weather.api.LocationProvider
 import com.polyhub.weather.api.RetrofitClient
+import com.polyhub.weather.api.WeatherUI
 import com.polyhub.weather.api.toUiModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +25,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val dataStore: DataStore<Preferences>,
-    private val locationProvider: LocationProvider
+    private val locationProvider: LocationProvider,
+    database: AppDatabase
 ) : ViewModel() {
 
     private val api: Api = RetrofitClient.api
@@ -34,10 +37,11 @@ class MainViewModel(
     val state: StateFlow<MainViewState> = _state
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
+    val cityDao = database.cityDao()
 
     val hasRequestedPermission: StateFlow<Boolean> =
         dataStore.data
-            .map { it[PreferencesKeys.HES_REQUESTETED_LOCATION_PERMISSION] ?: false }
+            .map { it[PreferencesKeys.HES_REQUESTED_LOCATION_PERMISSION] ?: false }
             .stateIn(
                 scope = viewModelScope,
                 started = (SharingStarted.WhileSubscribed(5_000)),
@@ -51,7 +55,7 @@ class MainViewModel(
     fun saveRequestedPermission(requested: Boolean) {
         viewModelScope.launch {
             dataStore.edit { settings ->
-                settings[PreferencesKeys.HES_REQUESTETED_LOCATION_PERMISSION] = requested
+                settings[PreferencesKeys.HES_REQUESTED_LOCATION_PERMISSION] = requested
             }
         }
     }
@@ -70,48 +74,62 @@ class MainViewModel(
 
         viewModelScope.launch {
             _isRefreshing.value = true
-            loadWeather(true)
-            _isRefreshing.value = false
+            try {
+                fetchWeather()
+            } finally {
+                _isRefreshing.value = false
+            }
         }
     }
 
     private fun loadWeather() {
         viewModelScope.launch {
             _state.value = MainViewState.Loading
-            loadWeather(false)
+            fetchWeather()
         }
     }
 
-    private suspend fun loadWeather(isRefresh: Boolean) {
+    private suspend fun fetchWeather() {
         try {
             val location = getLocation()
 
-            if (location != null) {
-                val apiResponse: ApiResponse =
-                    api.getWeather(location.latitude, location.longitude)
-
-                val apiForecastResponse: ApiForecastResponse =
-                    api.getForecast(location.latitude, location.longitude)
-
-                _state.value =
-                    MainViewState.Success(apiResponse.toUiModel(), apiForecastResponse.toUiModel())
-
-            } else{
-                _state.value =
-                    MainViewState.Error("Не удалось определить местоположение")
+            if (location == null) {
+                _state.value = MainViewState.Error("Нет локации")
+                return
             }
+
+            val (weather, forecast) = loadWeatherData(location)
+
+            _state.value =
+                MainViewState.Success(weather, forecast)
+
         } catch (e: Exception){
             Log.e("MainViewModel", "Error loading weather data", e)
-            if (!isRefresh) {
-                _state.value =
-                    MainViewState.Error(e.message ?: "Unknown error")
-            }
+            _state.value =
+                MainViewState.Error(e.message ?: "Unknown error")
         }
     }
 
     @SuppressLint("MissingPermission")
     private suspend fun getLocation() : Location?{
         return locationProvider.getLastLocation()
+    }
+
+    private suspend fun loadWeatherData(location: Location)
+    : Pair<WeatherUI, ForecastUI> = kotlinx.coroutines.coroutineScope {
+
+        val weatherDeferred = async {
+            api.getWeather(location.latitude, location.longitude)
+        }
+
+        val forecastDeferred = async {
+            api.getForecast(location.latitude, location.longitude)
+        }
+
+        val weather = weatherDeferred.await().toUiModel()
+        val forecast = forecastDeferred.await().toUiModel()
+
+        weather to forecast
     }
 
 }

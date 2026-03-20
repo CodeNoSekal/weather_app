@@ -10,8 +10,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import com.polyhub.weather.api.Weather
-import kotlin.math.sin
+import com.polyhub.weather.api.WeatherUI
 import kotlin.random.Random
 
 data class SnowFlake(
@@ -25,7 +24,7 @@ data class SnowFlake(
 
 @Composable
 fun SnowAnimation(
-    weather: Weather
+    weatherUI: WeatherUI
 ) {
     val flakes = remember {
         SnapshotStateList<SnowFlake>().apply {

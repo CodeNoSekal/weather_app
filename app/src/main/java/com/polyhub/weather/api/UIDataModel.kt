@@ -3,8 +3,6 @@ package com.polyhub.weather.api
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
-import java.time.Duration
-import kotlin.time.Instant
 
 
 enum class WeatherType {
@@ -14,12 +12,12 @@ enum class WeatherType {
 enum class TimeOfDay {
     DAY, NIGHT
 }
-data class Weather(
+
+data class WeatherUI(
     val id: Int,
     val locationName: String,
     val temperature: String,
     val description: String,
-    val intensity: Int,
     val weatherType: WeatherType,
     val date: LocalDate,
     val time: LocalTime,
@@ -28,60 +26,50 @@ data class Weather(
     val timeOfDay: TimeOfDay
 )
 
-fun ApiResponse.toUiModel(): Weather {
-    val weather = this.weatherState.first()
-    val mainWeather = weather.main
+fun ApiResponse.toUiModel(): WeatherUI {
+    val weather = weatherState.first()
 
-    val weatherType = when(mainWeather) {
-        "Clear" -> WeatherType.CLEAR
-        "Clouds" -> WeatherType.CLOUDS
-        "Rain" -> WeatherType.RAIN
-        "Drizzle" -> WeatherType.RAIN
-        "Thunderstorm" -> WeatherType.RAIN
-        "Snow" -> WeatherType.SNOW
-        else -> WeatherType.OTHER
-    }
+    val zoneOffset = ZoneOffset.ofTotalSeconds(timezone)
 
-    val description = weather.desc.replaceFirstChar { it.uppercase() }
+    val dateTime = dt.toLocalDateTime(zoneOffset)
+    val currentTime = dateTime.toLocalTime()
+    val sunrise = sys.sunrise.toLocalDateTime(zoneOffset).toLocalTime()
+    val sunset = sys.sunset.toLocalDateTime(zoneOffset).toLocalTime()
 
-    val id = weather.id
-
-    val zoneOffset = ZoneOffset.ofTotalSeconds(this.timezone)
-
-    val instant = java.time.Instant.ofEpochSecond(this.dt)
-    val dateTime = instant.atOffset(zoneOffset)
-
-    val date = dateTime.toLocalDate()
-    val time = dateTime.toLocalTime()
-
-    val sunriseInstant = java.time.Instant.ofEpochSecond(this.sys.sunrise)
-    val sunrise = sunriseInstant.atOffset(zoneOffset).toLocalTime()
-
-    val sunsetInstant = java.time.Instant.ofEpochSecond(this.sys.sunset)
-    val sunset = sunsetInstant.atOffset(zoneOffset).toLocalTime()
-
-    val timeOfDay = getTimeOfDay(time, sunrise, sunset)
-
-    return Weather(
-        id = id,
-        locationName = this.city,
-        temperature = "${this.main.temp.toInt()}",
-        description = description,
-        intensity = 1,
-        weatherType = weatherType,
-        date = date,
-        time = time,
+    return WeatherUI(
+        id = weather.id,
+        locationName = city,
+        temperature = main.temp.toInt().toString(),
+        description = weather.desc.replaceFirstChar { it.uppercase() },
+        weatherType = weather.main.toWeatherType(),
+        date =  dateTime.toLocalDate(),
+        time = dateTime.toLocalTime(),
         sunrise = sunrise,
         sunset = sunset,
-        timeOfDay = timeOfDay
+        timeOfDay = currentTime.toTimeOfDay(sunrise, sunset)
     )
 
 }
 
-fun getTimeOfDay(time: LocalTime, sunrise: LocalTime, sunset: LocalTime): TimeOfDay {
-    if (time.isAfter(sunrise.minusHours(1)) && time.isBefore(sunset.plusHours(1))) {
-        return TimeOfDay.DAY
+fun LocalTime.toTimeOfDay(
+    sunrise: LocalTime,
+    sunset: LocalTime
+): TimeOfDay {
+    return if (this in sunrise..sunset) {
+        TimeOfDay.DAY
+    } else {
+        TimeOfDay.NIGHT
     }
+}
 
-    return TimeOfDay.NIGHT
+fun String.toWeatherType(): WeatherType = when (this) {
+    "Clear" -> WeatherType.CLEAR
+    "Clouds" -> WeatherType.CLOUDS
+    "Rain", "Drizzle", "Thunderstorm" -> WeatherType.RAIN
+    "Snow" -> WeatherType.SNOW
+    else -> WeatherType.OTHER
+}
+
+fun Long.toLocalDateTime(offset: ZoneOffset): java.time.OffsetDateTime {
+    return java.time.Instant.ofEpochSecond(this).atOffset(offset)
 }

@@ -9,13 +9,14 @@ import com.polyhub.weather.api.LocationProvider
 
 class MainViewModelFactory(
     private val dataStore: DataStore<Preferences>,
-    private val locationProvider: LocationProvider
+    private val locationProvider: LocationProvider,
+    private val database: AppDatabase
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MainViewModel(dataStore, locationProvider) as T
+            return MainViewModel(dataStore, locationProvider, database) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

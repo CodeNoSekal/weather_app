@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 
 object PreferencesKeys {
-    val HES_REQUESTETED_LOCATION_PERMISSION = booleanPreferencesKey("has_requested_location_permission")
+    val HES_REQUESTED_LOCATION_PERMISSION = booleanPreferencesKey("has_requested_location_permission")
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")

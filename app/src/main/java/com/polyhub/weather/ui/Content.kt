@@ -29,14 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.polyhub.weather.R
 import com.polyhub.weather.api.ForecastItem
-import com.polyhub.weather.api.Weather
-import com.polyhub.weather.api.WeatherForecast
+import com.polyhub.weather.api.ForecastUI
+import com.polyhub.weather.api.WeatherUI
 
 @Composable
 fun Content(
     modifier: Modifier = Modifier,
-    weather: Weather,
-    forecast: WeatherForecast
+    weatherUI: WeatherUI,
+    forecast: ForecastUI
 ){
     Box{
         Column(
@@ -44,15 +44,15 @@ fun Content(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            MainContent(weather, forecast)
+            MainContent(weatherUI, forecast)
         }
     }
 }
 
 @Composable
 fun MainContent(
-    weather: Weather,
-    forecast: WeatherForecast
+    weatherUI: WeatherUI,
+    forecast: ForecastUI
 ){
     Column(
         modifier = Modifier
@@ -62,7 +62,7 @@ fun MainContent(
     ) {
         Row{
             Text(
-                text = weather.temperature,
+                text = weatherUI.temperature,
                 fontSize = 72.sp,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -74,7 +74,7 @@ fun MainContent(
         }
 
         Text(
-            text = weather.description,
+            text = weatherUI.description,
             color = MaterialTheme.colorScheme.primary,
             fontSize = 20.sp
         )

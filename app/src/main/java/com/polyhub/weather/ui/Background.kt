@@ -8,19 +8,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.polyhub.weather.api.TimeOfDay
-import com.polyhub.weather.api.Weather
+import com.polyhub.weather.api.WeatherUI
 import com.polyhub.weather.api.WeatherType
 
 @Composable
 fun WeatherBackground(
-    weather: Weather
+    weatherUI: WeatherUI
 ) {
-    val colors = when(weather.weatherType){
-        WeatherType.CLEAR -> clearGradient(weather.timeOfDay)
-        WeatherType.CLOUDS -> cloudyGradient(weather.timeOfDay)
-        WeatherType.RAIN -> rainyGradient(weather.timeOfDay)
-        WeatherType.SNOW -> snowyGradient(weather.timeOfDay)
-        WeatherType.OTHER -> cloudyGradient(weather.timeOfDay)
+    val colors = when(weatherUI.weatherType){
+        WeatherType.CLEAR -> clearGradient(weatherUI.timeOfDay)
+        WeatherType.CLOUDS -> cloudyGradient(weatherUI.timeOfDay)
+        WeatherType.RAIN -> rainyGradient(weatherUI.timeOfDay)
+        WeatherType.SNOW -> snowyGradient(weatherUI.timeOfDay)
+        WeatherType.OTHER -> cloudyGradient(weatherUI.timeOfDay)
     }
 
 

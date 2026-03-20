@@ -1,8 +1,9 @@
 package com.polyhub.weather.api
 
+import com.polyhub.weather.City
 import com.squareup.moshi.Json
 
-data class ApiResponse(
+data class WeatherResponse(
     @param:Json(name = "weather")
     val weatherState: List<WeatherData>,
     val main: MainData,
@@ -19,10 +20,7 @@ data class WeatherData(
     val main: String,
     @param:Json(name = "description")
     val desc: String
-) {
-    val description: String
-        get() = desc.replaceFirstChar { it.uppercase() }
-}
+)
 
 data class CloudsData(
     val all: String
@@ -37,12 +35,12 @@ data class Sys(
     val sunset: Long
 )
 
-data class ApiForecastResponse(
-    val list: List<ApiForecastItem>,
+data class ForecastResponse(
+    val list: List<ForecastItem>,
     val city: LocationData
 )
 
-data class ApiForecastItem(
+data class ForecastItem(
     @param:Json(name = "dt")
     val dateTime: Long,
     val main: MainData
@@ -53,3 +51,21 @@ data class LocationData(
     val sunrise: Long,
     val sunset: Long
 )
+
+data class LocationResponse(
+    val results: List<Location>
+)
+
+data class Location(
+    val name: String,
+    @param:Json(name = "local_names")
+    val localNames: LocalNames?,
+    val lat: String,
+    val lon: String
+)
+
+data class LocalNames(
+    val ru: String?,
+    val en: String?
+)
+

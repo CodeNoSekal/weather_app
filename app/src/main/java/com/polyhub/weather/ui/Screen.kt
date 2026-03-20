@@ -1,6 +1,5 @@
 package com.polyhub.weather.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,34 +16,27 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
-import com.polyhub.weather.MainViewModel
-import com.polyhub.weather.api.Weather
-import com.polyhub.weather.api.WeatherForecast
+import com.polyhub.weather.api.ForecastUI
+import com.polyhub.weather.api.WeatherUI
 import com.polyhub.weather.api.WeatherType
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Screen(
-    weather: Weather,
-    viewModel: MainViewModel,
-    forecast: WeatherForecast,
-    navController: NavController
+    weather: WeatherUI,
+    forecast: ForecastUI,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    onMenuClick: () -> Unit
 ) {
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val pullRefreshState = rememberPullToRefreshState()
-    val onRefresh = { viewModel.refreshWeather() }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
     ){
         WeatherBackground(weather)
-
         WeatherAnimationLayer(weather)
 
         PullToRefreshBox(
@@ -56,28 +48,9 @@ fun Screen(
             Scaffold(
                 containerColor = Color.Transparent,
                 topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = weather.locationName,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-
-                        },
-                        navigationIcon = {
-                            IconButton(onClick = {
-                                navController.navigate("locations_screen")
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = "Menu",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.Transparent
-                        )
+                    WeatherTopBar(
+                        locationName = weather.locationName,
+                        onMenuClick = onMenuClick
                     )
                 },
 
@@ -87,7 +60,7 @@ fun Screen(
                 Content(
                     modifier = Modifier
                         .padding(innerPadding),
-                    weather = weather,
+                    weatherUI = weather,
                     forecast = forecast
                 )
             }
@@ -96,17 +69,43 @@ fun Screen(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WeatherTopBar(
+    locationName: String,
+    onMenuClick: () -> Unit
+){
+    TopAppBar(
+        title = {
+            Text(
+                text = locationName,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+        },
+        navigationIcon = {
+            IconButton(onClick = {
+                onMenuClick()
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Menu",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent
+        )
+    )
+}
+
 @Composable
 fun WeatherAnimationLayer(
-    weather: Weather
+    weatherUI: WeatherUI
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        when (weather.weatherType) {
-            WeatherType.SNOW -> SnowAnimation(weather)
-            else -> {}
-        }
+    when (weatherUI.weatherType) {
+        WeatherType.SNOW -> SnowAnimation(weatherUI)
+        else -> Unit
     }
 }
