@@ -66,8 +66,8 @@ fun App(viewModel: MainViewModel){
         composable("locations_screen") {
             LocationsRoute(state, viewModel, navController)
         }
-        composable("search") {
-            CitySearch(viewModel, navController)
+        composable("search_screen") {
+            SearchRoute(viewModel, navController)
         }
     }
 }
@@ -100,13 +100,14 @@ fun LocationsRoute(
         LocationsScreen(
             success.uiData.weatherUI,
             viewModel,
-            navController
+            back = { navController.navigateUp() },
+            onSearchClick = { navController.navigate("search_screen") }
         )
     }
 }
 
 @Composable
-fun CitySearch(
+fun SearchRoute(
     viewModel: MainViewModel,
     navController: NavController
 ) {

@@ -26,7 +26,8 @@ import com.polyhub.weather.api.WeatherUI
 fun LocationsScreen(
     weatherUI: WeatherUI,
     viewModel: MainViewModel,
-    navController: NavController
+    back: () -> Unit,
+    onSearchClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -47,7 +48,7 @@ fun LocationsScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = {
-                            navController.navigateUp()
+                            back()
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -58,7 +59,7 @@ fun LocationsScreen(
                     },
                     actions = {
                         IconButton(onClick = {
-
+                            onSearchClick()
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Search,
