@@ -63,9 +63,9 @@ data class LocationResponse(
     @param:Json(name = "local_names")
     val localNames: LocalNames?,
     @param:Json(name = "lat")
-    val latitude: Double,
+    val latitude: String,
     @param:Json(name = "lon")
-    val longitude: Double
+    val longitude: String
 )
 
 data class LocalNames(

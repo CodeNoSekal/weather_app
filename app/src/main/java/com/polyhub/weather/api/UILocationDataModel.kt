@@ -2,7 +2,9 @@ package com.polyhub.weather.api
 
 
 data class LocationUI (
-    val name: String
+    val name: String,
+    val latitude: String,
+    val longitude: String
 )
 
 
@@ -19,7 +21,11 @@ fun List<LocationResponse>.toUiModel(): LocationUI {
 
             val name = location.localNames.ru.drop(targetIndex)
 
-            return LocationUI(name)
+            return LocationUI(
+                name,
+                latitude = location.latitude,
+                longitude = location.longitude
+            )
         }
     }
 
@@ -29,5 +35,9 @@ fun List<LocationResponse>.toUiModel(): LocationUI {
 
     val name = location.name.drop(targetIndex)
 
-    return LocationUI(name)
+    return LocationUI(
+        name,
+        latitude = location.latitude,
+        longitude = location.longitude
+    )
 }

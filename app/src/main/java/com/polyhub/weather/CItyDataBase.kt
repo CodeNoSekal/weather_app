@@ -17,8 +17,8 @@ import java.util.UUID
 data class City(
     @PrimaryKey val id: UUID,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "lat") val lat: Double,
-    @ColumnInfo(name = "lon") val lon: Double
+    @ColumnInfo(name = "lat") val lat: String,
+    @ColumnInfo(name = "lon") val lon: String
 )
 
 @Dao
@@ -27,7 +27,7 @@ interface CityDao {
     fun getAll(): Flow<List<City>>
 
     @Query("SELECT * FROM city WHERE id IN (:cityId)")
-    suspend fun loadById(cityId: Int): City
+    suspend fun loadById(cityId: UUID): City
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg city: City)

@@ -12,14 +12,20 @@ import com.polyhub.weather.api.Location
 import com.polyhub.weather.api.LocationProvider
 import com.polyhub.weather.api.RetrofitClient
 import com.polyhub.weather.api.UIData
+import com.polyhub.weather.api.WeatherUI
 import com.polyhub.weather.api.toUiModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class MainViewModel(
     private val dataStore: DataStore<Preferences>,
@@ -31,9 +37,15 @@ class MainViewModel(
 
     private val _state = MutableStateFlow<MainViewState>(MainViewState.Loading)
     private val _isRefreshing = MutableStateFlow(false)
+    private val _searchResults = MutableStateFlow<List<UIData>>(listOf())
+    private val _response = MutableStateFlow<List<UIData>>(listOf())
 
     val state: StateFlow<MainViewState> = _state
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
+    val searchResults: StateFlow<List<UIData>> = _searchResults
+    val response: StateFlow<List<UIData>> = _response
+
+    var cityID: UUID? = null
 
     val cityDao = database.cityDao()
 
@@ -48,6 +60,7 @@ class MainViewModel(
 
     init {
         loadWeather()
+        request()
     }
 
     fun saveRequestedPermission(requested: Boolean) {
@@ -73,7 +86,17 @@ class MainViewModel(
         viewModelScope.launch {
             _isRefreshing.value = true
             try {
-                fetchWeather()
+                var location: Location? = null
+
+                if (cityID != null){
+                    val city = cityDao.loadById(cityID!!)
+
+                    location = Location(city.lat, city.lon)
+                }else{
+                    location = getLocation()
+                }
+
+                fetchWeather(location)
             } finally {
                 _isRefreshing.value = false
             }
@@ -83,23 +106,25 @@ class MainViewModel(
     private fun loadWeather() {
         viewModelScope.launch {
             _state.value = MainViewState.Loading
-            fetchWeather()
+            try {
+                fetchWeather(getLocation())
+            } catch (e: Exception){
+                Log.e("MainViewModel", "Error loading weather data", e)
+                _state.value =
+                    MainViewState.Error(e.message ?: "Unknown error")
+            }
         }
     }
 
-    private suspend fun fetchWeather() {
+    private suspend fun fetchWeather(location: Location?) {
         try {
-            val location = getLocation()
-
             if (location == null) {
                 _state.value = MainViewState.Error("Нет локации")
                 return
             }
 
-            val uiData = loadWeatherData(location)
-
             _state.value =
-                MainViewState.Success(uiData)
+                MainViewState.Success(loadWeatherData(location))
 
         } catch (e: Exception){
             Log.e("MainViewModel", "Error loading weather data", e)
@@ -113,8 +138,10 @@ class MainViewModel(
         return locationProvider.getLastLocation()
     }
 
-    private suspend fun loadWeatherData(location: Location)
-    : UIData = kotlinx.coroutines.coroutineScope {
+    private suspend fun loadWeatherData(
+        location: Location,
+        id: UUID? = null
+    ) : UIData = coroutineScope {
 
         val weatherDeferred = async {
             api.getWeather(location.latitude, location.longitude)
@@ -132,7 +159,82 @@ class MainViewModel(
         val forecast = forecastDeferred.await().toUiModel()
         val location = locationNameDeferred.await().toUiModel()
 
-        UIData(weather, forecast, location)
+        UIData(id = id, weatherUI = weather, forecastUI = forecast, locationUI = location)
+    }
+
+
+    fun findCity(query: String){
+        viewModelScope.launch {
+            fetchCity(query)
+        }
+    }
+
+
+    private suspend fun fetchCity(query: String){
+        try {
+            val foundCities = api.findCity(query)
+
+            val results = mutableListOf<UIData>()
+
+            foundCities.forEach { city ->
+                results.add(loadWeatherData(Location(city.latitude, city.longitude)))
+            }
+
+            _searchResults.value = results
+        } catch (e: Exception){
+            Log.e("MainViewModel", "Error searching cities", e)
+        }
+    }
+
+    fun onCitySelected(city: UIData){
+        viewModelScope.launch {
+
+            val uuid = UUID.randomUUID()
+
+            cityDao.insert(
+                City(
+                    id = uuid,
+                    name = city.locationUI.name,
+                    lat = city.locationUI.latitude,
+                    lon = city.locationUI.longitude
+                )
+            )
+
+            cityID = uuid
+
+            refreshWeather()
+        }
+    }
+
+    fun request(){
+        viewModelScope.launch {
+            try {
+                val results = mutableListOf<UIData>()
+
+                val location = getLocation()
+
+                if (location != null){
+                    results.add(loadWeatherData(location))
+                }
+
+                val cities = cityDao.getAll().first()
+
+                cities.forEach { city ->
+                    results.add(loadWeatherData(Location(city.lat, city.lon), city.id))
+                }
+
+                _response.value = results
+
+
+            }catch (e: Exception){
+                Log.e("MainViewModel", "Error loading weather data", e)
+            }
+        }
+    }
+
+    fun updateCityID(id: UUID?){
+        cityID = id
+        refreshWeather()
     }
 
 }

@@ -1,8 +1,12 @@
 package com.polyhub.weather.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Search
@@ -19,15 +23,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.polyhub.weather.MainViewModel
+import com.polyhub.weather.api.UIData
 import com.polyhub.weather.api.WeatherUI
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ListItem
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationsScreen(
     weatherUI: WeatherUI,
-    viewModel: MainViewModel,
-    back: () -> Unit,
-    onSearchClick: () -> Unit
+    response: List<UIData>,
+    onBackClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    setID: (UUID?) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -48,7 +57,7 @@ fun LocationsScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = {
-                            back()
+                            onBackClick()
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -79,7 +88,9 @@ fun LocationsScreen(
         ) { innerPadding ->
             LocationContent(
                 modifier = Modifier
-                    .padding(innerPadding)
+                    .padding(innerPadding),
+                response = response,
+                setID = setID
             )
         }
     }
@@ -87,7 +98,35 @@ fun LocationsScreen(
 
 @Composable
 fun LocationContent(
-    modifier: Modifier
+    modifier: Modifier,
+    response: List<UIData>,
+    setID: (UUID?) -> Unit
 ) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize()
+    ) {
+        items(response) {item ->
+            LocationItem(
+                item = item,
+                modifier = Modifier.clickable {
+                    setID(item.id)
+                }
+            )
+        }
+    }
+}
+
+
+@Composable
+fun LocationItem(
+    item: UIData,
+    modifier: Modifier
+){
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Text(item.locationUI.name)
+    }
 
 }
